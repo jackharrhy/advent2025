@@ -1,0 +1,44 @@
+# Advent 2025 - Day 2
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.17.0"}
+])
+```
+
+## Section
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file")
+```
+
+```elixir
+ranges =
+input
+|> Kino.Input.read()
+|> String.split(",")
+|> Enum.map(fn range ->
+  [start, ending] = range
+  |> String.split("-")
+  |> Enum.map(&String.to_integer/1)
+
+  start..ending
+  |> Enum.map(fn num_id ->
+    id = Integer.to_string(num_id)
+
+    if rem(String.length(id), 2) == 0 do
+      {l, r} = String.split_at(id, floor(String.length(id) / 2))
+
+      if l == r do
+        num_id
+      else
+        nil
+      end
+    else
+      nil
+    end
+  end)
+  |> Enum.filter(&(&1))
+end)
+|> List.flatten()
+```
