@@ -6,11 +6,13 @@ Mix.install([
 ])
 ```
 
-## Section
+## Setup
 
 ```elixir
 input = Kino.Input.textarea("Please paste your input file")
 ```
+
+## Part 1
 
 ```elixir
 ranges =
