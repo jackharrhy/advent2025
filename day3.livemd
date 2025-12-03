@@ -1,0 +1,53 @@
+# Advent 2025 - Day 3
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.17.0"}
+])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file")
+```
+
+```elixir
+defmodule Battery do
+  def find(bats) do
+    [x | [y | _l] = list] = bats
+
+    find({x, y}, list)
+  end
+
+  def find({x, y}, [a | [b | _r] = rest]) do
+    {x, y} = cond do
+      a > x -> {a, b}
+      a > y -> {x, a}
+      true -> {x, y}
+    end
+
+    find({x, y}, rest)
+  end
+
+  def find({x, y}, [a | []]) do
+    {x, y} = cond do
+      a > y -> {x, a}
+      true -> {x, y}
+    end
+
+    {x, y}
+  end
+end
+
+input
+|> Kino.Input.read()
+|> String.split("\n")
+|> Enum.map(fn bats ->
+  bats = bats |> String.graphemes() |> Enum.map(&String.to_integer/1)
+
+  {x, y} = Battery.find(bats)
+  x * 10 + y
+end)
+|> Enum.sum()
+```
