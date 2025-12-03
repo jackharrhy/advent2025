@@ -12,8 +12,10 @@ Mix.install([
 input = Kino.Input.textarea("Please paste your input file")
 ```
 
+## Part 1
+
 ```elixir
-defmodule Battery do
+defmodule TwoSlotBattery do
   def find(bats) do
     [x | [y | _l] = list] = bats
 
@@ -46,8 +48,77 @@ input
 |> Enum.map(fn bats ->
   bats = bats |> String.graphemes() |> Enum.map(&String.to_integer/1)
 
-  {x, y} = Battery.find(bats)
+  {x, y} = TwoSlotBattery.find(bats)
   x * 10 + y
+end)
+|> Enum.sum()
+```
+
+## Part 2
+
+```elixir
+defmodule TwelveSlotBattery do
+  def find(list) do
+    power = 1..12 |> Enum.map(fn _x -> nil end)
+    find(power, list)
+  end
+
+  def find(power, [a | rest]) do
+    rest_len = length(rest)
+
+    replace = power
+    |> Enum.with_index()
+    |> Enum.find_index(fn {p, i} ->
+      cond do
+        p == nil -> true
+        a > p and (11 - i) <= rest_len -> true
+        true -> false
+      end
+    end)
+
+    power = if replace do
+      power = List.replace_at(power, replace, a)
+
+      power = power
+      |> Enum.with_index()
+      |> Enum.map(fn {elm, index} ->
+        if index > replace do
+          nil
+        else
+          elm
+        end
+      end)
+
+      power
+    else
+      power
+    end
+
+    result = find(power, rest)
+
+    if result do
+      result
+    else
+      false
+    end
+  end
+
+  def find(power, []) do
+    if power |> Enum.any?(&(is_nil(&1))) do
+      false
+    else
+      power
+    end
+  end
+end
+
+input
+|> Kino.Input.read()
+|> String.split("\n")
+|> Enum.map(fn bats ->
+  bats = bats |> String.graphemes() |> Enum.map(&String.to_integer/1)
+
+  TwelveSlotBattery.find(bats) |> Enum.join("") |> Integer.parse() |> elem(0)
 end)
 |> Enum.sum()
 ```
