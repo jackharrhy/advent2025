@@ -32,13 +32,7 @@ defmodule Util do
   def bounds(cur), do: cur
 end
 
-input
-|> Kino.Input.read()
-|> String.split("\n")
-|> Enum.map(fn v ->
-  {dir, val} = String.split_at(v, 1)
-  {String.to_atom(dir), Integer.parse(val) |> elem(0)}
-end)
+moves
 |> Enum.reduce({50, 0}, fn {dir, val}, {cur, seen_0} ->
   cur = case dir do
     :L -> cur - val
