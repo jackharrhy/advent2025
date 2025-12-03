@@ -94,21 +94,11 @@ defmodule TwelveSlotBattery do
       power
     end
 
-    result = find(power, rest)
-
-    if result do
-      result
-    else
-      false
-    end
+    find(power, rest)
   end
 
   def find(power, []) do
-    if power |> Enum.any?(&(is_nil(&1))) do
-      false
-    else
-      power
-    end
+    power
   end
 end
 
