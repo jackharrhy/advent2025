@@ -1,0 +1,97 @@
+# Advent 2025 - Day 4
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.17.0"}
+])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file")
+```
+
+## Part 1
+
+```elixir
+grid = input
+  |> Kino.Input.read()
+  |> String.split("\n")
+  |> Enum.map(fn row ->
+    String.graphemes(row) |> Enum.map(fn
+      "." -> :.
+      "@" -> :@
+    end)
+  end)
+```
+
+```elixir
+defmodule PaperMan do
+  def get_at(grid, {x, y}) do
+    if x < 0 or y < 0 do
+      nil
+    else
+      row = Enum.at(grid, y)
+
+      if is_nil(row) do
+        nil
+      else
+        Enum.at(row, x)
+      end
+    end
+  end
+
+  def can_forklift(grid, {x, y}) do
+    value = get_at(grid, {x, y})
+
+    if value == :@ do
+      check_surronding(grid, {x, y})
+    else
+      :.
+    end
+  end
+
+  def check_surronding(grid, {x, y}) do
+    paper_count = for xp <- -1..1 do
+      for yp <- -1..1 do
+        if xp == 0 and yp == 0 do
+          0
+        else
+          x = xp + x
+          y = yp + y
+          value = get_at(grid, {x, y})
+
+          if value == :@ do
+            1
+          else
+            0
+          end
+        end
+      end
+    end
+    |> List.flatten()
+    |> Enum.sum()
+
+    if paper_count < 4 do
+      :x
+    else
+      :@
+    end
+  end
+end
+
+size = length(grid)
+
+marked_grid = for y <- 0..(size - 1) do
+  for x <- 0..(size - 1) do
+    PaperMan.can_forklift(grid, {x, y})
+  end
+end
+```
+
+```elixir
+marked_grid
+|> List.flatten()
+|> Enum.count(&(&1 == :x))
+```
