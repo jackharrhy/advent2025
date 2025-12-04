@@ -27,7 +27,7 @@ grid = input
 ```
 
 ```elixir
-defmodule PaperMan do
+defmodule PaperBoy do
   def get_at(grid, {x, y}) do
     if x < 0 or y < 0 do
       nil
@@ -85,7 +85,7 @@ size = length(grid)
 
 marked_grid = for y <- 0..(size - 1) do
   for x <- 0..(size - 1) do
-    PaperMan.can_forklift(grid, {x, y})
+    PaperBoy.can_forklift(grid, {x, y})
   end
 end
 ```
@@ -94,4 +94,45 @@ end
 marked_grid
 |> List.flatten()
 |> Enum.count(&(&1 == :x))
+```
+
+## Part 2
+
+```elixir
+defmodule PaperMan do
+  def collect_rolls(grid, rolls \\ 0) do
+    size = length(grid)
+    
+    marked_grid = for y <- 0..(size - 1) do
+      for x <- 0..(size - 1) do
+        PaperBoy.can_forklift(grid, {x, y})
+      end
+    end
+
+    marked_count = count_marked_grid(marked_grid)
+
+    if marked_count == 0 do
+      rolls
+    else
+      cleaned_grid = marked_grid
+        |> Enum.map(fn row ->
+          row
+          |> Enum.map(fn
+            :x -> :.
+            x -> x
+          end)
+        end)
+
+      collect_rolls(cleaned_grid, rolls + marked_count)
+    end
+  end
+
+  def count_marked_grid(marked_grid) do
+    marked_grid
+    |> List.flatten()
+    |> Enum.count(&(&1 == :x))
+  end
+end
+
+PaperMan.collect_rolls(grid)
 ```
