@@ -45,3 +45,62 @@ end)
 |> Enum.filter(&(&1))
 |> Enum.count()
 ```
+
+## Part 2
+
+```elixir
+defmodule RangeSmush do
+  def smush_ranges([range | ranges]) do
+    smush_ranges([range], ranges)
+  end
+
+  def smush_ranges(existing, [range | rest]) do
+    to_smush = Enum.find(existing, fn r ->
+      not Range.disjoint?(range, r)
+    end)
+
+    if to_smush do
+      case smush(to_smush, range) do
+        :ignore ->
+          smush_ranges(existing, rest)
+        :replace ->
+          existing = existing |> Enum.filter(&(&1 != to_smush))
+          smush_ranges(existing, [range | rest])
+        range ->
+          smush_ranges(existing, [range | rest])
+      end
+    else
+      smush_ranges([range] ++ existing, rest)
+    end
+  end
+
+  def smush_ranges(existing, []) do
+    existing
+  end
+
+  def smush(existing, new) do
+    e1..e2//_ = existing
+    n1..n2//_ = new
+
+    cond do
+      # if new is within existing, ignore
+      e1 <= n1 and e2 >= n2 -> :ignore
+
+      # if new is over existing, replace
+      n1 < e1 and n2 > e2 -> :replace
+
+      # if new starts before existing, trimmed range
+      n1 < e1 -> n1..(e1 - 1)
+
+      # if new ends after existing, trimmed range
+      n2 > e2 -> (e2 + 1)..n2
+    end
+  end
+end
+
+smushed_ranges = RangeSmush.smush_ranges(ranges)
+```
+
+```elixir
+smushed_ranges |> Enum.map(&(Range.size(&1))) |> Enum.sum()
+```
