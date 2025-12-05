@@ -1,0 +1,47 @@
+# Advent 2025 - Day 5
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.17.0"}
+])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file")
+```
+
+## Part 1
+
+```elixir
+[ranges, ingredients] = input |> Kino.Input.read() |> String.split("\n\n")
+
+ranges = ranges
+  |> String.split("\n")
+  |> Enum.map(fn range ->
+    [from, to] = String.split(range, "-")
+
+    (Integer.parse(from) |> elem(0))..(Integer.parse(to) |> elem(0))
+  end)
+
+ingredients = ingredients
+  |> String.split("\n")
+  |> Enum.map(fn ingredient ->
+    Integer.parse(ingredient) |> elem(0)
+  end)
+
+[ranges, ingredients]
+```
+
+```elixir
+ingredients
+|> Enum.map(fn ingredient ->
+  ranges
+  |> Enum.any?(fn range ->
+    ingredient in range
+  end)
+end)
+|> Enum.filter(&(&1))
+|> Enum.count()
+```
