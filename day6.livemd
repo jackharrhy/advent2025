@@ -44,3 +44,42 @@ maths
 end)
 |> Enum.sum()
 ```
+
+## Part 2
+
+```elixir
+proper_maths = input
+|> Kino.Input.read()
+|> String.split("\n")
+|> Enum.map(&(String.graphemes(&1)))
+|> Enum.zip()
+|> Enum.map(fn tuple ->
+  tuple
+  |> Tuple.to_list()
+  |> Enum.filter(&(&1 !== " "))
+  |> Enum.map(fn val ->
+    case Integer.parse(val) do
+      {val, _} -> val
+        :error -> String.to_atom(val)
+    end
+  end)
+end)
+|> Enum.chunk_by(&(&1 == []))
+|> Enum.take_every(2)
+```
+
+```elixir
+proper_maths
+|> Enum.map(fn math ->
+  [first | rest] = math
+
+  {op, first} = List.pop_at(first, length(first)-1)
+
+  nums = [first | rest] |> Enum.map(&(Integer.undigits(&1)))
+
+  Enum.reduce(nums, fn num, acc ->
+    apply(Kernel, op, [num, acc])
+  end)
+end)
+|> Enum.sum()
+```
