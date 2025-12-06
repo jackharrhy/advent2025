@@ -1,0 +1,46 @@
+# Advent 2025 - Day 6
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.17.0"}
+])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file")
+```
+
+## Part 1
+
+```elixir
+maths = input
+|> Kino.Input.read()
+|> String.split("\n")
+|> Enum.map(fn line ->
+  line
+  |> String.split(" ")
+  |> Enum.filter(&(&1 != ""))
+  |> Enum.map(fn val ->
+    case Integer.parse(val) do
+      {val, _} -> val
+        :error -> String.to_atom(val)
+    end
+  end)
+end)
+|> Enum.zip()
+|> Enum.map(&(Tuple.to_list(&1)))
+```
+
+```elixir
+maths
+|> Enum.map(fn math ->
+  {op, nums} = List.pop_at(math, length(math) - 1)
+
+  Enum.reduce(nums, fn num, acc ->
+    apply(Kernel, op, [num, acc])
+  end)
+end)
+|> Enum.sum()
+```
